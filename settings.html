@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SentimentAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+        .bg-gradient-dark {
+            background: linear-gradient(135deg, #0B1426 0%, #1A2332 50%, #2D3748 100%);
+        }
+        .bg-gradient-card {
+            background: linear-gradient(135deg, #1A2332 0%, #2D3748 100%);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #374151;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch.active {
+            background: #3B82F6;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+        .api-status {
+            transition: all 0.3s ease;
+        }
+        .api-status.connected {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10B981;
+            color: #10B981;
+        }
+        .api-status.disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #EF4444;
+            color: #EF4444;
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #374151;
+            border-radius: 3px;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3B82F6;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3B82F6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-dark min-h-screen text-white overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="font-display text-2xl font-bold">SentimentAI</div>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+                    <a href="analytics.html" class="text-gray-300 hover:text-white transition-colors">Analytics</a>
+                    <a href="settings.html" class="text-blue-400 font-medium border-b-2 border-blue-400 pb-1">Settings</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="pt-24 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="font-display text-4xl font-bold mb-2">Platform Settings</h1>
+                    <p class="text-gray-300">Configure your sentiment analysis platform</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <button class="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Settings Tabs -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div class="flex space-x-8 border-b border-white/10">
+            <button class="settings-tab active pb-4 px-2 border-b-2 border-blue-400 text-blue-400 font-medium" data-tab="api">
+                API Connections
+            </button>
+            <button class="settings-tab pb-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors" data-tab="analysis">
+                Analysis Preferences
+            </button>
+            <button class="settings-tab pb-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors" data-tab="notifications">
+                Notifications
+            </button>
+            <button class="settings-tab pb-4 px-2 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors" data-tab="data">
+                Data Management
+            </button>
+        </div>
+    </section>
+
+    <!-- API Connections Tab -->
+    <section class="settings-content active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" id="api-tab">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Facebook API -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-2xl">📘</div>
+                        <div>
+                            <h3 class="font-semibold text-lg">Facebook</h3>
+                            <p class="text-sm text-gray-400">Social media platform</p>
+                        </div>
+                    </div>
+                    <div class="api-status connected px-3 py-1 rounded-full text-sm border">
+                        Connected
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">API Key</label>
+                        <input type="password" value="••••••••••••••••" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">App ID</label>
+                        <input type="text" value="123456789012345" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <span class="text-sm text-gray-300">Auto-sync</span>
+                        <div class="toggle-switch active" data-setting="facebook-sync"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instagram API -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-2xl">📷</div>
+                        <div>
+                            <h3 class="font-semibold text-lg">Instagram</h3>
+                            <p class="text-sm text-gray-400">Photo sharing platform</p>
+                        </div>
+                    </div>
+                    <div class="api-status disconnected px-3 py-1 rounded-full text-sm border">
+                        Disconnected
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">API Key</label>
+                        <input type="password" placeholder="Enter your API key" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Access Token</label>
+                        <input type="password" placeholder="Enter access token" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <span class="text-sm text-gray-300">Auto-sync</span>
+                        <div class="toggle-switch" data-setting="instagram-sync"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TikTok API -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center text-2xl">🎵</div>
+                        <div>
+                            <h3 class="font-semibold text-lg">TikTok</h3>
+                            <p class="text-sm text-gray-400">Video sharing platform</p>
+                        </div>
+                    </div>
+                    <div class="api-status connected px-3 py-1 rounded-full text-sm border">
+                        Connected
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">API Key</label>
+                        <input type="password" value="••••••••••••••••" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Secret Key</label>
+                        <input type="password" value="••••••••••••••••" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div class="flex items-center justify-between pt-4">
+                        <span class="text-sm text-gray-300">Auto-sync</span>
+                        <div class="toggle-switch active" data-setting="tiktok-sync"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Preferences Tab -->
+    <section class="settings-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 hidden" id="analysis-tab">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Sentiment Thresholds -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10">
+                <h3 class="font-display text-2xl font-bold mb-6">Sentiment Thresholds</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-sm text-gray-300">Positive Threshold</label>
+                            <span class="text-blue-400 font-medium" id="positive-value">0.7</span>
+                        </div>
+                        <input type="range" min="0" max="1" step="0.1" value="0.7" class="range-slider w-full" id="positive-threshold">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>0.0</span>
+                            <span>1.0</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-sm text-gray-300">Negative Threshold</label>
+                            <span class="text-red-400 font-medium" id="negative-value">-0.3</span>
+                        </div>
+                        <input type="range" min="-1" max="0" step="0.1" value="-0.3" class="range-slider w-full" id="negative-threshold">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>-1.0</span>
+                            <span>0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Settings -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10">
+                <h3 class="font-display text-2xl font-bold mb-6">Analysis Settings</h3>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium">Include Sarcasm Detection</h4>
+                            <p class="text-sm text-gray-400">Advanced irony and sarcasm analysis</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="sarcasm-detection"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium">Context Analysis</h4>
+                            <p class="text-sm text-gray-400">Consider conversation context</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="context-analysis"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium">Emoji Analysis</h4>
+                            <p class="text-sm text-gray-400">Include emoji sentiment scoring</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="emoji-analysis"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium">Real-time Processing</h4>
+                            <p class="text-sm text-gray-400">Process new content immediately</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="real-time-processing"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notifications Tab -->
+    <section class="settings-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 hidden" id="notifications-tab">
+        <div class="bg-gradient-card rounded-2xl p-8 border border-white/10">
+            <h3 class="font-display text-2xl font-bold mb-6">Notification Preferences</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <h4 class="font-semibold text-lg">Email Notifications</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">Daily Summary</h5>
+                                <p class="text-sm text-gray-400">Daily sentiment overview</p>
+                            </div>
+                            <div class="toggle-switch active" data-setting="email-daily"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">Weekly Reports</h5>
+                                <p class="text-sm text-gray-400">Detailed weekly analysis</p>
+                            </div>
+                            <div class="toggle-switch active" data-setting="email-weekly"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">Alert Thresholds</h5>
+                                <p class="text-sm text-gray-400">Sentiment spike alerts</p>
+                            </div>
+                            <div class="toggle-switch" data-setting="email-alerts"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <h4 class="font-semibold text-lg">Dashboard Alerts</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">Real-time Notifications</h5>
+                                <p class="text-sm text-gray-400">In-browser alerts</p>
+                            </div>
+                            <div class="toggle-switch active" data-setting="dashboard-realtime"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">Campaign Updates</h5>
+                                <p class="text-sm text-gray-400">Campaign performance alerts</p>
+                            </div>
+                            <div class="toggle-switch active" data-setting="dashboard-campaigns"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="font-medium">System Alerts</h5>
+                                <p class="text-sm text-gray-400">Platform status notifications</p>
+                            </div>
+                            <div class="toggle-switch active" data-setting="dashboard-system"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Management Tab -->
+    <section class="settings-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 hidden" id="data-tab">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Storage Usage -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10">
+                <h3 class="font-display text-2xl font-bold mb-6">Storage Usage</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300">Used Storage</span>
+                            <span class="font-medium">2.4 GB / 10 GB</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="bg-blue-600 h-3 rounded-full" style="width: 24%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Analysis Data</span>
+                                <span>1.2 GB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Raw Content</span>
+                                <span>800 MB</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Reports</span>
+                                <span>300 MB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Cache</span>
+                                <span>100 MB</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                        Clear Cache
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data Retention -->
+            <div class="bg-gradient-card rounded-2xl p-8 border border-white/10">
+                <h3 class="font-display text-2xl font-bold mb-6">Data Retention</h3>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Raw Content</label>
+                        <select class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">
+                            <option>30 days</option>
+                            <option>60 days</option>
+                            <option>90 days</option>
+                            <option>1 year</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Analysis Results</label>
+                        <select class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">
+                            <option>1 year</option>
+                            <option>2 years</option>
+                            <option>5 years</option>
+                            <option>Forever</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-2">Reports</label>
+                        <select class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">
+                            <option>2 years</option>
+                            <option>5 years</option>
+                            <option>Forever</option>
+                        </select>
+                    </div>
+                    <button class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                        Export All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-white/10 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+            <p>&copy; 2025 SentimentAI. Advanced social media sentiment analysis platform.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
